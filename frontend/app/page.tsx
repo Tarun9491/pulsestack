@@ -46,39 +46,42 @@ export default function Home() {
         setContactStatus("loading");
 
         try {
-            // 1. Direct browser submission to Web3Forms (instant delivery to tarunlakkoju925@gmail.com)
-            const w3Res = await fetch("https://api.web3forms.com/submit", {
+            // Direct delivery to tarunlakkoju925@gmail.com via FormSubmit (No complex API keys required)
+            const res = await fetch("https://formsubmit.co/ajax/tarunlakkoju925@gmail.com", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Accept: "application/json",
                 },
                 body: JSON.stringify({
-                    access_key: "5da0da3a-ead6-49c0-9fa7-cb3a56c2fc2b",
                     name: contactForm.name,
                     email: contactForm.email,
-                    subject: `⚡ [PULSESTACK] ${contactForm.subject || "New Opportunity Inquiry"} from ${contactForm.name}`,
-                    message: `Sender Name: ${contactForm.name}\nEmail: ${contactForm.email}\nSubject: ${contactForm.subject || "Opportunity Inquiry"}\n\nMessage:\n${contactForm.message}`,
-                    from_name: "PULSESTACK Portfolio",
+                    _subject: `⚡ [PULSESTACK Recruiter Alert] ${contactForm.subject || "Opportunity Inquiry"} from ${contactForm.name}`,
+                    message: contactForm.message,
+                    _template: "box",
+                    _captcha: "false"
                 }),
             });
 
-            const w3Data = await w3Res.json();
+            const data = await res.json();
 
-            // 2. Also log to internal server endpoint
+            // Also log to internal server endpoint
             fetch("/api/contact", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(contactForm),
             }).catch(() => {});
 
-            if (w3Res.ok && w3Data.success) {
+            if (data.success === "true" || data.success === true) {
                 setContactStatus("success");
                 setContactMsg("✔ Message sent successfully! Delivered directly to Tarun's inbox (tarunlakkoju925@gmail.com).");
                 setContactForm({ name: "", email: "", subject: "", message: "" });
+            } else if (data.message && data.message.includes("Activation")) {
+                setContactStatus("success");
+                setContactMsg("✔ Please check your Gmail (tarunlakkoju925@gmail.com) and click 'Activate Form' once to start receiving all recruiter messages instantly.");
             } else {
                 setContactStatus("error");
-                setContactMsg(w3Data.message || "Failed to deliver. Please use the direct email link below.");
+                setContactMsg(data.message || "Failed to deliver. Please click below to send via your email client directly.");
             }
         } catch (err: any) {
             setContactStatus("error");
