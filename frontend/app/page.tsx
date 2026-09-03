@@ -46,24 +46,43 @@ export default function Home() {
         setContactStatus("loading");
 
         try {
-            const res = await fetch("/api/contact", {
+            // 1. Direct browser submission to Web3Forms (instant delivery to tarunlakkoju925@gmail.com)
+            const w3Res = await fetch("https://api.web3forms.com/submit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: JSON.stringify({
+                    access_key: "5da0da3a-ead6-49c0-9fa7-cb3a56c2fc2b",
+                    name: contactForm.name,
+                    email: contactForm.email,
+                    subject: `⚡ [PULSESTACK] ${contactForm.subject || "New Opportunity Inquiry"} from ${contactForm.name}`,
+                    message: `Sender Name: ${contactForm.name}\nEmail: ${contactForm.email}\nSubject: ${contactForm.subject || "Opportunity Inquiry"}\n\nMessage:\n${contactForm.message}`,
+                    from_name: "PULSESTACK Portfolio",
+                }),
+            });
+
+            const w3Data = await w3Res.json();
+
+            // 2. Also log to internal server endpoint
+            fetch("/api/contact", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(contactForm),
-            });
+            }).catch(() => {});
 
-            const data = await res.json();
-            if (res.ok && data.success) {
+            if (w3Res.ok && w3Data.success) {
                 setContactStatus("success");
-                setContactMsg(data.message || "Message sent successfully!");
+                setContactMsg("✔ Message sent successfully! Delivered directly to Tarun's inbox (tarunlakkoju925@gmail.com).");
                 setContactForm({ name: "", email: "", subject: "", message: "" });
             } else {
                 setContactStatus("error");
-                setContactMsg(data.error || "Failed to send message. Please try again.");
+                setContactMsg(w3Data.message || "Failed to deliver. Please use the direct email link below.");
             }
         } catch (err: any) {
             setContactStatus("error");
-            setContactMsg("Network error. Backend might be unreachable: " + err.message);
+            setContactMsg("Delivery error. Please reach out directly to tarunlakkoju925@gmail.com.");
         }
     };
 
