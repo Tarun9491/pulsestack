@@ -467,10 +467,21 @@ export default function Home() {
                             <button
                                 type="submit"
                                 disabled={contactStatus === "loading"}
-                                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:opacity-95 text-white font-semibold text-xs shadow-lg shadow-blue-600/25 transition-all disabled:opacity-50"
+                                className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:opacity-95 text-white font-semibold text-xs sm:text-sm shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                             >
-                                {contactStatus === "loading" ? "Sending Message..." : "Submit Inquiry to Backend"}
+                                <Send className="w-4 h-4" />
+                                <span>{contactStatus === "loading" ? "Delivering Message..." : "Send Message Directly to Tarun"}</span>
                             </button>
+
+                            <p className="text-[11px] text-center text-zinc-400 pt-1">
+                                Need an immediate response? You can also email directly at{" "}
+                                <a 
+                                    href="mailto:tarunlakkoju925@gmail.com?subject=Opportunity%20Inquiry" 
+                                    className="text-cyan-400 hover:underline font-medium"
+                                >
+                                    tarunlakkoju925@gmail.com
+                                </a>
+                            </p>
                         </form>
 
                     </div>
